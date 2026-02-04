@@ -1,0 +1,6 @@
+{
+  "name": "Sipocalypse Fun - V2 Webhook",
+  "description": "A React and Tailwind CSS rebuild of Sipocalypse.fun, featuring a Gemini API powered drinking game generator for ultimate party fun.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}

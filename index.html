@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sipocalypse Fun</title>
+  <!-- Global 'process' object shim - MUST BE THE VERY FIRST SCRIPT -->
+  <script>
+    if (typeof process === 'undefined') {
+      var process = {
+        env: {},
+        browser: true,
+        version: '',
+        versions: {},
+        nextTick: function(fn) { setTimeout(fn, 0); },
+        platform: 'browser' // Common property checked by some libraries
+      };
+      console.log('Global "process" object shim (var process, with platform) created.');
+    }
+  </script>
+  <!-- Add your favicon link here, e.g., <link rel="icon" href="/favicon.ico" /> -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FONT LOADING SECTION -->
+  <!-- Current fonts loaded: Luckiest Guy & Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!--
+    IMPORTANT: TO USE THE 'Elizeth' FONT (or any other custom font), YOU MUST LOAD IT.
+    Tailwind is configured below to use 'Elizeth', but the font files themselves are not loaded by this default setup.
+    Here are two common ways to load fonts:
+
+    1. IF 'Elizeth' IS ON GOOGLE FONTS (e.g., 'Elizeth Extrabold 800'):
+       Search for it on fonts.google.com. If found, Google Fonts will provide a <link> tag.
+       You would then ADD or MERGE that link here. For example, if 'Elizeth' Extrabold (800 weight) is available,
+       your combined link might look like:
+       <link href="https://fonts.googleapis.com/css2?family=Elizeth:wght@800&family=Luckiest+Guy&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+       (Ensure the font name 'Elizeth' in the CSS/Tailwind config matches the name provided by Google Fonts exactly).
+
+    2. IF YOU HAVE THE FONT FILES (e.g., elizeth-extrabold.woff2):
+       a. Place the font files in a publicly accessible folder in your project (e.g., create an 'assets/fonts/' directory).
+       b. Then, define the font using @font-face rules within the <style> tags below (or in a separate CSS file linked here).
+          Example (adjust paths and font details as needed):
+          ----------------------------------------------------
+          <style>
+            @font-face {
+              font-family: 'Elizeth'; /* This name must match the key in tailwind.config.fontFamily */
+              src: url('/assets/fonts/elizeth-extrabold.woff2') format('woff2'),
+                   url('/assets/fonts/elizeth-extrabold.woff') format('woff');
+              font-weight: 800; /* Corresponds to 'extrabold' */
+              font-style: normal; /* Or 'italic' if it's an italic variant */
+            }
+            /* ... other styles ... */
+          </style>
+          ----------------------------------------------------
+  -->
+  
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif; /* Default fallback font */
+    }
+    .font-luckiest {
+      font-family: 'Luckiest Guy', cursive;
+    }
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FDE6CE; /* custom-peach */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #FF00FF; /* custom-pink */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6A0DAD; /* custom-purple */
+    }
+
+    /* Custom Slider Thumb Styles */
+    .custom-slider-thumb::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 32px;
+      height: 32px;
+      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      cursor: pointer;
+      border: none;
+      box-shadow: none !important;
+      outline: none; /* Added */
+      border-radius: 0; /* Added */
+      margin-top: -10px; 
+    }
+
+    .custom-slider-thumb::-moz-range-thumb {
+      width: 32px;
+      height: 32px;
+      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      cursor: pointer;
+      border: none; 
+      box-shadow: none !important; 
+      border-radius: 0; 
+      outline: none; /* Added */
+    }
+
+    .custom-slider-thumb:disabled::-webkit-slider-thumb {
+      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      filter: grayscale(100%);
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none !important;
+      outline: none; /* Added */
+      border-radius: 0; /* Added */
+    }
+
+    .custom-slider-thumb:disabled::-moz-range-thumb {
+      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      filter: grayscale(100%);
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none !important;
+      border-radius: 0; /* Already present or ensured */
+      outline: none; /* Added */
+    }
+
+    /* Custom styles for rule and dare numbers */
+    .rules-list li::marker,
+    .dares-list li::marker {
+      color: #FF00FF; /* custom-pink */
+      font-weight: bold;
+    }
+
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.1.0",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
+  }
+}
+</script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'custom-peach': '#FDE6CE',    // Light peachy background
+            'custom-orange': '#FFA500',   // A standard orange for accents if needed
+            'custom-purple': '#6A0DAD',   // Dark purple for text
+            'custom-deep-purple': '#582C83', // Even darker purple for button text
+            'custom-pink': '#FF00FF',     // Bright pink for accents/borders
+            'custom-lime': '#ADFF2F',     // Lime green for primary buttons
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            luckiest: ['Luckiest Guy', 'cursive'],
+            comic: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+            jubilat: ['Jubilat', 'Poppins', 'sans-serif'], // Keep fallbacks
+            viroqua: ['Viroqua', 'Jubilat', 'Poppins', 'sans-serif'], // Keep fallbacks
+            lexia: ['Lexia', 'Viroqua', 'Jubilat', 'Poppins', 'sans-serif'], // Keep fallbacks
+            // 'Elizeth' is defined here. For it to work, the font files must be loaded (see comments above).
+            elizeth: ['Elizeth', 'Lexia', 'Viroqua', 'Jubilat', 'Poppins', 'sans-serif'], 
+          },
+          animation: {
+            pulsate: 'pulsate 2.5s ease-in-out infinite',
+          },
+          keyframes: {
+            pulsate: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.05)' },
+            }
+          },
+        }
+      }
+    }
+  </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-transparent">
+  <div id="root"></div>
+  <script type="module" src="./index.js"></script> <!-- Changed from index.tsx to index.js -->
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
