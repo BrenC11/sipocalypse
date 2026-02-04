@@ -10,7 +10,7 @@ import CheckboxInput from './CheckboxInput.js';
 import TextInput from './TextInput.js';
 import SliderInput from './SliderInput.js';
 
-const COCKTAIL_WEBHOOK_URL = 'https://hook.eu2.make.com/tre1fp9e0ayyugq3x18phpky3k51eonm';
+const COCKTAIL_API_URL = '/api/send-cocktail';
 
 const GameGenerator = () => {
   const [options, setOptions] = React.useState({ // Changed to React.useState
@@ -108,9 +108,9 @@ const GameGenerator = () => {
     }
   };
 
-  const sendCocktailRequestToWebhook = async (activity, email) => {
+  const sendCocktailEmailRequest = async (activity, email) => {
     const payload = { activity, email };
-    const response = await fetch(COCKTAIL_WEBHOOK_URL, {
+    const response = await fetch(COCKTAIL_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -118,16 +118,12 @@ const GameGenerator = () => {
         body: JSON.stringify(payload),
     });
     if (!response.ok) {
-        let errorDetails = `Webhook request failed with status: ${response.status}`;
-        try {
-            const errorText = await response.text();
-            if (errorText) {
-                errorDetails += ` - ${errorText}`;
-            }
-        } catch (e) { /* Ignore */ }
+        const errorPayload = await response.json().catch(() => ({}));
+        const errorDetails = typeof errorPayload?.error === 'string'
+          ? errorPayload.error
+          : `Request failed with status ${response.status}`;
         throw new Error(errorDetails);
     }
-    console.log('Webhook response:', await response.text());
   };
 
   const handleCocktailEmailChange = (e) => {
@@ -147,7 +143,7 @@ const GameGenerator = () => {
     setCocktailSubmissionStatus('submitting');
     setCocktailSubmissionError(null);
     try {
-        await sendCocktailRequestToWebhook(options.activity, cocktailEmail);
+        await sendCocktailEmailRequest(options.activity, cocktailEmail);
         setCocktailSubmissionStatus('success');
     } catch (err) {
         console.error("Error sending cocktail request:", err);

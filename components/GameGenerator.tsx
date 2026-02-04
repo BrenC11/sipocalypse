@@ -10,7 +10,7 @@ import CheckboxInput from './CheckboxInput';
 import TextInput from './TextInput';
 import SliderInput from './SliderInput';
 
-const COCKTAIL_WEBHOOK_URL = 'https://hook.eu2.make.com/tre1fp9e0ayyugq3x18phpky3k51eonm';
+const COCKTAIL_API_URL = '/api/send-cocktail';
 
 const GameGenerator: React.FC = () => {
   const [options, setOptions] = useState<GameOptions>({
@@ -109,9 +109,9 @@ const GameGenerator: React.FC = () => {
   };
 
 
-  const sendCocktailRequestToWebhook = async (activity: string, email: string): Promise<void> => {
+  const sendCocktailEmailRequest = async (activity: string, email: string): Promise<void> => {
     const payload = { activity, email };
-    const response = await fetch(COCKTAIL_WEBHOOK_URL, {
+    const response = await fetch(COCKTAIL_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -119,20 +119,12 @@ const GameGenerator: React.FC = () => {
         body: JSON.stringify(payload),
     });
     if (!response.ok) {
-        // Try to get error text, but Make.com might not always provide a useful body for non-200s
-        let errorDetails = `Webhook request failed with status: ${response.status}`;
-        try {
-            const errorText = await response.text();
-            if (errorText) {
-                errorDetails += ` - ${errorText}`;
-            }
-        } catch (e) {
-            // Ignore error from parsing response text
-        }
+        const errorPayload = await response.json().catch(() => ({}));
+        const errorDetails = typeof errorPayload?.error === 'string'
+          ? errorPayload.error
+          : `Request failed with status ${response.status}`;
         throw new Error(errorDetails);
     }
-     // Make.com usually returns 'Accepted' or similar for successful webhook reception
-    console.log('Webhook response:', await response.text()); 
   };
 
   const handleCocktailEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +145,7 @@ const GameGenerator: React.FC = () => {
     setCocktailSubmissionStatus('submitting');
     setCocktailSubmissionError(null);
     try {
-        await sendCocktailRequestToWebhook(options.activity, cocktailEmail);
+        await sendCocktailEmailRequest(options.activity, cocktailEmail);
         setCocktailSubmissionStatus('success');
         // Do not clear email on success immediately to let user see what they submitted
         // setCocktailEmail(''); 

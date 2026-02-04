@@ -7,7 +7,7 @@ const PrivacyPolicyPage = () => {
       React.createElement("h1", { className: "text-4xl font-luckiest text-center mb-3 bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text" },
         "Privacy Policy"
       ),
-      React.createElement("p", { className: "text-center text-sm text-gray-500 mb-10" }, "Last updated: 03/06/2025"),
+      React.createElement("p", { className: "text-center text-sm text-gray-500 mb-10" }, "Last updated: 02/04/2026"),
       React.createElement("div", { className: "text-gray-300 space-y-6" },
         React.createElement("p", { className: "leading-relaxed" },
           "Sipocalypse (“we”, “us”, or “our”) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website (www.sipocalypse.fun), including when you submit your email to receive a custom cocktail recipe or join our mailing list."
@@ -50,7 +50,7 @@ const PrivacyPolicyPage = () => {
             "Your data is securely stored using industry-standard practices. We do not share, sell, or rent your information to third parties."
           ),
           React.createElement("p", { className: "leading-relaxed" },
-            "We use Make.com (formerly Integromat) to automate our email system. You can read Make.com’s Privacy Policy for more info on their data handling."
+            "We use OpenAI to generate game and cocktail content and Resend to deliver recipe emails. These providers process data on our behalf to run the service."
           )
         ),
         React.createElement("div", null,
