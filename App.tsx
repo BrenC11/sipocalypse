@@ -62,9 +62,14 @@ const App: React.FC = () => {
       {/* Global Background Layer */}
       <div className="fixed inset-0 z-0">
         <img
-          src="https://i.imgur.com/5EqDvlN.jpeg"
+          src="/background-1280.jpeg"
+          srcSet="/background-1280.jpeg 1280w, /background-1920.jpeg 1920w"
+          sizes="100vw"
           alt="Abstract party background"
           className="w-full h-full object-cover opacity-90"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-black/10"></div>
       </div>

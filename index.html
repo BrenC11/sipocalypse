@@ -4,25 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sipocalypse Fun</title>
-  <!-- Global 'process' object shim - MUST BE THE VERY FIRST SCRIPT -->
-  <script>
-    if (typeof process === 'undefined') {
-      var process = {
-        env: {},
-        browser: true,
-        version: '',
-        versions: {},
-        nextTick: function(fn) { setTimeout(fn, 0); },
-        platform: 'browser' // Common property checked by some libraries
-      };
-      console.log('Global "process" object shim (var process, with platform) created.');
-    }
-  </script>
-  <!-- Add your favicon link here, e.g., <link rel="icon" href="/favicon.ico" /> -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- FONT LOADING SECTION -->
-  <!-- Current fonts loaded: Luckiest Guy & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!--
@@ -83,7 +68,7 @@
       appearance: none;
       width: 32px;
       height: 32px;
-      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      background: transparent url('/slider-thumb.png') center center / contain no-repeat;
       cursor: pointer;
       border: none;
       box-shadow: none !important;
@@ -95,7 +80,7 @@
     .custom-slider-thumb::-moz-range-thumb {
       width: 32px;
       height: 32px;
-      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      background: transparent url('/slider-thumb.png') center center / contain no-repeat;
       cursor: pointer;
       border: none; 
       box-shadow: none !important; 
@@ -104,7 +89,7 @@
     }
 
     .custom-slider-thumb:disabled::-webkit-slider-thumb {
-      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      background: transparent url('/slider-thumb.png') center center / contain no-repeat;
       filter: grayscale(100%);
       opacity: 0.6;
       cursor: not-allowed;
@@ -114,7 +99,7 @@
     }
 
     .custom-slider-thumb:disabled::-moz-range-thumb {
-      background: transparent url('https://i.imgur.com/zCLTodn.png') center center / contain no-repeat;
+      background: transparent url('/slider-thumb.png') center center / contain no-repeat;
       filter: grayscale(100%);
       opacity: 0.6;
       cursor: not-allowed;
@@ -131,15 +116,6 @@
     }
 
   </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.1.0",
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/"
-  }
-}
-</script>
 <script>
     tailwind.config = {
       theme: {
@@ -175,11 +151,9 @@
       }
     }
   </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-transparent">
   <div id="root"></div>
-  <script type="module" src="./index.js"></script> <!-- Changed from index.tsx to index.js -->
-<script type="module" src="/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>

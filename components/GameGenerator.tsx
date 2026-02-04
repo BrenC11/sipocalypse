@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GameOptions, GeneratedGame } from '../types';
 import { CHAOS_LEVELS, MIN_RULES, MAX_RULES, DEFAULT_RULES, FUNNY_ACTIVITY_EXAMPLES, SOCIAL_LINKS } from '../constants'; 
-import { generateGameViaWebhook } from '../services/gameService'; // Updated import path and function name
+import { generateGameViaWebhook } from '../services/gameService';
 import GameDisplay from './GameDisplay';
 import Button from './Button';
 import SelectInput from './SelectInput';
@@ -91,7 +91,7 @@ const GameGenerator: React.FC = () => {
       };
       console.log("GameGenerator Debug: paramsForService (to be sent to service):", paramsForService); // Added log
 
-      const game = await generateGameViaWebhook(paramsForService); // Updated function call
+      const game = await generateGameViaWebhook(paramsForService);
       setGeneratedGame(game);
     } catch (err: any) {
       console.error("Error generating game:", err);
@@ -181,9 +181,11 @@ const GameGenerator: React.FC = () => {
         `}
       >
         <img
-          src="https://i.imgur.com/0F9BW4r.png"
+          src="/mascot-socials-512.png"
           alt="Sipocalypse Mascot pointing to Instagram"
           className="w-full h-full"
+          loading="lazy"
+          decoding="async"
         />
       </a>
       <h2 className="text-4xl font-luckiest text-center mb-8 bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text">

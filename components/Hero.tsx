@@ -12,9 +12,12 @@ const Hero: React.FC = () => {
       
       <div className="relative z-10 flex flex-col items-center">
         <img
-          src="https://i.imgur.com/Po8Zaen.png"
+          src="/sipocalypse-logo.png"
           alt="Sipocalypse Logo"
           className="max-w-lg w-full h-auto mb-8 md:mb-10 mx-auto animate-pulsate"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
         />
         <p className="font-luckiest text-custom-purple text-3xl md:text-4xl max-w-3xl mx-auto mb-10">
           Every activity is now a drinking game. You’re welcome.

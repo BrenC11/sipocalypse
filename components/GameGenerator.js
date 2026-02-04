@@ -173,9 +173,11 @@ const GameGenerator = () => {
         `
       },
         React.createElement("img", {
-          src: "https://i.imgur.com/0F9BW4r.png",
+          src: "/mascot-socials-512.png",
           alt: "Sipocalypse Mascot pointing to Instagram",
-          className: "w-full h-full"
+          className: "w-full h-full",
+          loading: "lazy",
+          decoding: "async"
         })
       ),
       React.createElement("h2", { className: "text-4xl font-luckiest text-center mb-8 bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text" },

@@ -59,9 +59,14 @@ const App = () => {
     React.createElement("div", { className: "bg-transparent text-gray-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white" },
       React.createElement("div", { className: "fixed inset-0 z-0" },
         React.createElement("img", {
-          src: "https://i.imgur.com/5EqDvlN.jpeg",
+          src: "/background-1280.jpeg",
+          srcSet: "/background-1280.jpeg 1280w, /background-1920.jpeg 1920w",
+          sizes: "100vw",
           alt: "Abstract party background",
-          className: "w-full h-full object-cover opacity-90"
+          className: "w-full h-full object-cover opacity-90",
+          loading: "eager",
+          fetchPriority: "high",
+          decoding: "async"
         }),
         React.createElement("div", { className: "absolute inset-0 bg-black/10" })
       ),

@@ -10,9 +10,12 @@ const Hero = () => {
     React.createElement("div", { className: "relative h-[calc(100vh-56px)] min-h-[500px] md:min-h-[600px] flex items-center justify-center text-center px-4 overflow-hidden" },
       React.createElement("div", { className: "relative z-10 flex flex-col items-center" },
         React.createElement("img", {
-          src: "https://i.imgur.com/Po8Zaen.png",
+          src: "/sipocalypse-logo.png",
           alt: "Sipocalypse Logo",
-          className: "max-w-lg w-full h-auto mb-8 md:mb-10 mx-auto animate-pulsate"
+          className: "max-w-lg w-full h-auto mb-8 md:mb-10 mx-auto animate-pulsate",
+          loading: "eager",
+          fetchPriority: "high",
+          decoding: "async"
         }),
         React.createElement("p", { className: "font-luckiest text-custom-purple text-3xl md:text-4xl max-w-3xl mx-auto mb-10" },
           "Every activity is now a drinking game. You’re welcome."

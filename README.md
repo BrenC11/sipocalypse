@@ -1,14 +1,19 @@
-# Run and deploy your AI Studio app
+# Sipocalypse Website
 
-This contains everything you need to run your app locally.
+## Run locally
 
-## Run Locally
+Prerequisites: Node.js 18+
 
-**Prerequisites:**  Node.js
+1. Install dependencies: `npm install`
+2. Create `.env.local` with:
+   - `OPENAI_API_KEY=...`
+   - `OPENAI_MODEL=gpt-4.1-mini` (optional, defaults to this)
+3. Start dev server: `npm run dev`
 
+## API integration
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- Frontend calls `POST /api/generate-game`
+- `api/generate-game.js` calls OpenAI Chat Completions using your server-side secret
+- Main game generation no longer uses Make.com webhook
+
+Note: the cocktail email capture flow in `components/GameGenerator.tsx` still posts to a Make.com webhook.
