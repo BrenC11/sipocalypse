@@ -5,6 +5,7 @@ import Footer from './components/Footer.js';
 import Hero from './components/Hero.js';
 import GameGenerator from './components/GameGenerator.js';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage.js';
+import AdminDashboard from './components/AdminDashboard.tsx';
 
 const App = () => {
   const [route, setRoute] = React.useState(window.location.hash); // Changed to React.useState
@@ -29,6 +30,8 @@ const App = () => {
 
   if (route === '#/privacy') {
     pageContent = React.createElement(PrivacyPolicyPage, null);
+  } else if (route === '#/admin') {
+    pageContent = React.createElement(AdminDashboard, null);
   } else {
     // Default to main page if hash is empty, '#', or anything else
     showHero = true;

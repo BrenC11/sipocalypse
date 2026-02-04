@@ -13,6 +13,22 @@ const Header = () => {
         React.createElement(
           "nav",
           { className: "flex items-center space-x-4" },
+          React.createElement(
+            "a",
+            {
+              href: "#/admin",
+              className: "text-xs md:text-sm text-white/80 hover:text-custom-lime transition-colors duration-300"
+            },
+            "Admin"
+          ),
+          React.createElement(
+            "a",
+            {
+              href: "#/privacy",
+              className: "text-xs md:text-sm text-white/80 hover:text-custom-lime transition-colors duration-300"
+            },
+            "Privacy"
+          ),
           SOCIAL_LINKS.map((link) => (
             React.createElement(
               "a",
