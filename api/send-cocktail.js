@@ -177,6 +177,7 @@ export default async function handler(req, res) {
   const siteUrl = process.env.SITE_URL || "https://sipocalypse.fun";
   const googleSheetWebhookUrl = process.env.GSHEET_WEBHOOK_URL;
   const googleSheetWebhookSecret = process.env.GSHEET_WEBHOOK_SECRET;
+  const strictSheetLogging = process.env.GSHEET_STRICT === "true";
   const logoUrl = `${siteUrl.replace(/\/$/, "")}/sipocalypse-logo.png`;
 
   if (!openAiKey) {
@@ -259,7 +260,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // Optional lead capture (non-blocking for user experience).
+    const sheetResult = {
+      attempted: Boolean(googleSheetWebhookUrl),
+      success: false,
+      error: null,
+    };
+
+    // Optional lead capture.
     if (googleSheetWebhookUrl) {
       try {
         await appendLeadToGoogleSheet({
@@ -268,12 +275,21 @@ export default async function handler(req, res) {
           email,
           activity,
         });
+        sheetResult.success = true;
       } catch (sheetError) {
-        console.error("Lead capture failed:", sheetError);
+        sheetResult.error = sheetError instanceof Error ? sheetError.message : "Unknown sheet error";
+        console.error("Lead capture failed:", sheetResult.error);
+        if (strictSheetLogging) {
+          return res.status(502).json({
+            success: false,
+            error: "Email sent, but Google Sheet logging failed.",
+            sheet: sheetResult,
+          });
+        }
       }
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, sheet: sheetResult });
   } catch (error) {
     return res.status(500).json({
       error: "Server error while sending cocktail email.",

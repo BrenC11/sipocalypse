@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Hero from './components/Hero';
 import GameGenerator from './components/GameGenerator';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage'; // New import
+import AdminDashboard from './components/AdminDashboard';
 
 const App: React.FC = () => {
   const [route, setRoute] = useState(window.location.hash);
@@ -29,6 +30,8 @@ const App: React.FC = () => {
 
   if (route === '#/privacy') {
     pageContent = <PrivacyPolicyPage />;
+  } else if (route === '#/admin') {
+    pageContent = <AdminDashboard />;
   } else {
     // Default to main page if hash is empty, '#', or anything else
     showHero = true;

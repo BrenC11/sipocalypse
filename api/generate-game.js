@@ -1,3 +1,5 @@
+import { appendGameRecord, getDateStringInTimezone, isGoogleSheetsConfigured } from "./_lib/googleSheets.js";
+
 const CHAOS_LABELS = {
   1: "Initial Sips",
   2: "Rising Revelry",
@@ -55,6 +57,13 @@ const normalizeStringArray = (value) => {
   return value
     .map((item) => (typeof item === "string" ? item.trim() : ""))
     .filter(Boolean);
+};
+
+const toChaosScore = (chaosLevel, ruleCount, dareCount) => {
+  const levelPoints = Math.max(1, Math.min(4, chaosLevel)) * 20;
+  const rulePoints = Math.min(30, ruleCount * 3);
+  const darePoints = Math.min(20, dareCount * 4);
+  return Math.max(0, Math.min(100, Math.round(levelPoints + rulePoints + darePoints)));
 };
 
 export default async function handler(req, res) {
@@ -155,10 +164,33 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: "No rules were generated." });
     }
 
+    let sheet = { attempted: false, success: false, error: null };
+    if (isGoogleSheetsConfigured()) {
+      sheet.attempted = true;
+      try {
+        const chaosScore = toChaosScore(chaosLevel, rules.length, dares.length);
+        await appendGameRecord({
+          gameId: `game_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+          date: getDateStringInTimezone(),
+          activity,
+          gameName: title,
+          chaosLevel,
+          rules,
+          dares,
+          chaosScore,
+          status: "generated",
+        });
+        sheet.success = true;
+      } catch (error) {
+        sheet.error = error instanceof Error ? error.message : "Unknown Google Sheets logging error";
+      }
+    }
+
     return res.status(200).json({
       title,
       rules,
       dares,
+      sheet,
     });
   } catch (error) {
     return res.status(500).json({

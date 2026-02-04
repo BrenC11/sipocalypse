@@ -109,13 +109,13 @@ const GameGenerator = () => {
   };
 
   const sendCocktailEmailRequest = async (activity, email) => {
-    const payload = { activity, email };
+    const requestBody = { activity, email };
     const response = await fetch(COCKTAIL_API_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(requestBody),
     });
     if (!response.ok) {
         const errorPayload = await response.json().catch(() => ({}));
@@ -123,6 +123,10 @@ const GameGenerator = () => {
           ? errorPayload.error
           : `Request failed with status ${response.status}`;
         throw new Error(errorDetails);
+    }
+    const responsePayload = await response.json().catch(() => null);
+    if (responsePayload?.sheet?.attempted && !responsePayload?.sheet?.success) {
+      console.warn('Google Sheet logging failed:', responsePayload?.sheet?.error || 'Unknown sheet error');
     }
   };
 

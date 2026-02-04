@@ -8,6 +8,12 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4 flex justify-end items-center"> {/* Changed justify-between to justify-end */}
         {/* Logo/Title removed */}
         <nav className="flex items-center space-x-4">
+          <a href="#/admin" className="text-xs md:text-sm text-white/80 hover:text-custom-lime transition-colors duration-300">
+            Admin
+          </a>
+          <a href="#/privacy" className="text-xs md:text-sm text-white/80 hover:text-custom-lime transition-colors duration-300">
+            Privacy
+          </a>
           {SOCIAL_LINKS.map((link) => (
             <a
               key={link.name}
