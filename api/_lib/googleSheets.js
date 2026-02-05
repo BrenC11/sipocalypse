@@ -41,6 +41,14 @@ const DEFAULT_WINNERS_HEADERS = [
   "created_at",
 ];
 
+const DEFAULT_MAILING_LIST_HEADERS = [
+  "timestamp",
+  "email",
+  "activity",
+  "source",
+  "status",
+];
+
 const GAMES_FIELDS = [
   { key: "gameId", aliases: ["game_id", "game id", "id"] },
   { key: "date", aliases: ["date"] },
@@ -77,6 +85,14 @@ const WINNERS_FIELDS = [
   { key: "socialCaption", aliases: ["social_caption", "social caption"] },
   { key: "postedAt", aliases: ["posted_at", "posted at"] },
   { key: "createdAt", aliases: ["created_at", "created at"] },
+];
+
+const MAILING_LIST_FIELDS = [
+  { key: "timestamp", aliases: ["timestamp", "created_at", "created at"] },
+  { key: "email", aliases: ["email"] },
+  { key: "activity", aliases: ["activity"] },
+  { key: "source", aliases: ["source"] },
+  { key: "status", aliases: ["status"] },
 ];
 
 let tokenCache = {
@@ -178,8 +194,9 @@ const getGoogleAccessToken = async () => {
   return tokenCache.accessToken;
 };
 
-const callSheetsApi = async (path, init = {}) => {
-  const { spreadsheetId } = getConfig();
+const callSheetsApi = async (path, init = {}, spreadsheetIdOverride = "") => {
+  const { spreadsheetId: configuredSpreadsheetId } = getConfig();
+  const spreadsheetId = spreadsheetIdOverride || configuredSpreadsheetId;
   if (!spreadsheetId) {
     throw new Error("Missing GOOGLE_SHEETS_SPREADSHEET_ID.");
   }
@@ -202,34 +219,42 @@ const callSheetsApi = async (path, init = {}) => {
   return resp.json();
 };
 
-const getValues = async (range) => {
+const getValues = async (range, spreadsheetIdOverride = "") => {
   const encodedRange = encodeURIComponent(range);
-  const payload = await callSheetsApi(`/values/${encodedRange}`);
+  const payload = await callSheetsApi(`/values/${encodedRange}`, {}, spreadsheetIdOverride);
   return payload.values || [];
 };
 
-const updateValues = async (range, values) => {
+const updateValues = async (range, values, spreadsheetIdOverride = "") => {
   const encodedRange = encodeURIComponent(range);
-  return callSheetsApi(`/values/${encodedRange}?valueInputOption=USER_ENTERED`, {
-    method: "PUT",
-    body: JSON.stringify({ values }),
-  });
+  return callSheetsApi(
+    `/values/${encodedRange}?valueInputOption=USER_ENTERED`,
+    {
+      method: "PUT",
+      body: JSON.stringify({ values }),
+    },
+    spreadsheetIdOverride,
+  );
 };
 
-const appendValues = async (range, values) => {
+const appendValues = async (range, values, spreadsheetIdOverride = "") => {
   const encodedRange = encodeURIComponent(range);
-  return callSheetsApi(`/values/${encodedRange}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, {
-    method: "POST",
-    body: JSON.stringify({ values }),
-  });
+  return callSheetsApi(
+    `/values/${encodedRange}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+    {
+      method: "POST",
+      body: JSON.stringify({ values }),
+    },
+    spreadsheetIdOverride,
+  );
 };
 
 const normalizeHeader = (value) => String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 
-const getHeaderRow = async (sheetName, defaults) => {
-  const current = await getValues(`${sheetName}!1:1`);
+const getHeaderRow = async (sheetName, defaults, spreadsheetIdOverride = "") => {
+  const current = await getValues(`${sheetName}!1:1`, spreadsheetIdOverride);
   if (current.length > 0 && current[0]?.length > 0) return current[0];
-  await updateValues(`${sheetName}!A1`, [defaults]);
+  await updateValues(`${sheetName}!A1`, [defaults], spreadsheetIdOverride);
   return defaults;
 };
 
@@ -255,8 +280,8 @@ const getFieldMapFromHeaders = (headers, fields) => {
   return keyToHeader;
 };
 
-const getSheetRows = async (sheetName) => {
-  const values = await getValues(`${sheetName}!A:Z`);
+const getSheetRows = async (sheetName, spreadsheetIdOverride = "") => {
+  const values = await getValues(`${sheetName}!A:Z`, spreadsheetIdOverride);
   if (!values.length) return { headers: [], rows: [] };
   const headers = values[0];
   const rows = values.slice(1).map((row) => {
@@ -299,15 +324,15 @@ const toRecordByFields = (row, headers, fields) => {
   return record;
 };
 
-const appendRecord = async (sheetName, defaults, fields, dataByKey) => {
-  const headers = await getHeaderRow(sheetName, defaults);
+const appendRecord = async (sheetName, defaults, fields, dataByKey, spreadsheetIdOverride = "") => {
+  const headers = await getHeaderRow(sheetName, defaults, spreadsheetIdOverride);
   const keyToHeader = getFieldMapFromHeaders(headers, fields);
   const row = headers.map((header) => {
     const field = fields.find((item) => keyToHeader[item.key] === header);
     if (!field) return "";
     return dataByKey[field.key] ?? "";
   });
-  await appendValues(`${sheetName}!A:Z`, [row]);
+  await appendValues(`${sheetName}!A:Z`, [row], spreadsheetIdOverride);
 };
 
 export const appendGameRecord = async ({
@@ -443,4 +468,43 @@ export const verifyGoogleSheetsAccess = async () => {
       error: error instanceof Error ? error.message : "Unknown Google Sheets error",
     };
   }
+};
+
+export const verifySheetAccess = async ({ spreadsheetId = "", sheetName }) => {
+  if (!sheetName) {
+    return { ok: false, error: "Missing sheetName." };
+  }
+  try {
+    await getValues(`${sheetName}!1:1`, spreadsheetId);
+    return { ok: true };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Unknown Google Sheets error",
+    };
+  }
+};
+
+export const appendCocktailLeadRecord = async ({
+  email,
+  activity,
+  source = "sipocalypse-cocktail-form",
+  status = "subscribed",
+  timestamp = new Date().toISOString(),
+  spreadsheetId = "",
+  sheetName = "mailing_list",
+}) => {
+  await appendRecord(
+    sheetName,
+    DEFAULT_MAILING_LIST_HEADERS,
+    MAILING_LIST_FIELDS,
+    {
+      timestamp,
+      email,
+      activity,
+      source,
+      status,
+    },
+    spreadsheetId,
+  );
 };
