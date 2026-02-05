@@ -92,7 +92,6 @@ export default async function handler(req, res) {
         model: imageModel,
         prompt,
         size: "1024x1024",
-        response_format: "url",
       }),
     });
 
@@ -114,8 +113,10 @@ export default async function handler(req, res) {
 
     const payload = await imageResp.json();
     const imageUrl = payload?.data?.[0]?.url || "";
-    if (!imageUrl) {
-      return res.status(502).json({ error: "OpenAI returned no image URL." });
+    const imageBase64 = payload?.data?.[0]?.b64_json || "";
+    const resolvedImageUrl = imageUrl || (imageBase64 ? `data:image/png;base64,${imageBase64}` : "");
+    if (!resolvedImageUrl) {
+      return res.status(502).json({ error: "OpenAI returned no image data." });
     }
 
     const update = await updateWinnerByDate({
@@ -137,12 +138,14 @@ export default async function handler(req, res) {
       winner: {
         ...winner,
         imagePrompt: prompt,
-        imageUrl,
+        imageUrl: resolvedImageUrl,
         status: "image_generated",
       },
-      imageUrl,
+      imageUrl: resolvedImageUrl,
       model: imageModel,
-      note: "Image URL expires after ~60 minutes unless you store it elsewhere.",
+      note: imageUrl
+        ? "Image URL expires after ~60 minutes unless you store it elsewhere."
+        : "Image returned as base64 data URL; store it for long-term use.",
     });
   } catch (error) {
     return res.status(500).json({
