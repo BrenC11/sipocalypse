@@ -61,6 +61,7 @@ export default async function handler(req, res) {
   if (!session) return;
 
   const openAiKey = process.env.OPENAI_API_KEY;
+  const imageModel = process.env.OPENAI_IMAGE_MODEL || "gpt-image-1.5";
   if (!openAiKey) {
     return res.status(500).json({ error: "Missing OPENAI_API_KEY on server." });
   }
@@ -88,7 +89,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${openAiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-image-1.5",
+        model: imageModel,
         prompt,
         size: "1024x1024",
         response_format: "url",
@@ -96,10 +97,18 @@ export default async function handler(req, res) {
     });
 
     if (!imageResp.ok) {
-      const details = await imageResp.text().catch(() => "");
+      const raw = await imageResp.text().catch(() => "");
+      let details = raw;
+      try {
+        const parsed = JSON.parse(raw);
+        details = parsed?.error?.message || raw;
+      } catch {
+        details = raw;
+      }
       return res.status(502).json({
         error: `OpenAI image request failed (${imageResp.status}).`,
         details,
+        model: imageModel,
       });
     }
 
@@ -132,6 +141,7 @@ export default async function handler(req, res) {
         status: "image_generated",
       },
       imageUrl,
+      model: imageModel,
       note: "Image URL expires after ~60 minutes unless you store it elsewhere.",
     });
   } catch (error) {

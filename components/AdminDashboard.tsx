@@ -164,7 +164,8 @@ const AdminDashboard: React.FC = () => {
       });
       const payload = await resp.json();
       if (!resp.ok) {
-        throw new Error(payload?.error || 'Image generation failed.');
+        const detailText = payload?.details ? ` (${payload.details})` : '';
+        throw new Error(`${payload?.error || 'Image generation failed.'}${detailText}`);
       }
       setWinner(payload?.winner || null);
       setImageStatus('Image generated.');
