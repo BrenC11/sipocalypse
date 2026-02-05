@@ -435,6 +435,22 @@ export const fetchGameById = async (gameId) => {
   };
 };
 
+export const fetchWinners = async () => {
+  const { headers, rows } = await getSheetRows("winners");
+  const mapped = rows.map((row) => toRecordByFields(row, headers, WINNERS_FIELDS));
+  return mapped
+    .filter((row) => row.date)
+    .map((row) => ({
+      date: row.date,
+      gameId: row.gameId,
+      activity: row.activity,
+      score: toNumberOr(row.score, 0),
+      status: row.status || "ready_for_card",
+      imageUrl: row.imageUrl || "",
+    }))
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
+};
+
 export const appendDailyScores = async (scores) => {
   if (!scores.length) return;
 

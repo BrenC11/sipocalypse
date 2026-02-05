@@ -1,26 +1,24 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Hero from './components/Hero';
 import GameGenerator from './components/GameGenerator';
-import PrivacyPolicyPage from './components/PrivacyPolicyPage'; // New import
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import AdminDashboard from './components/AdminDashboard';
+import AdminResults from './components/AdminResults';
+import AdminWinnerDetail from './components/AdminWinnerDetail';
 
 const App: React.FC = () => {
-  const [route, setRoute] = useState(() =>
-    typeof window !== 'undefined' ? window.location.hash : ''
-  );
+  const [route, setRoute] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const handleHashChange = () => {
       setRoute(window.location.hash);
-      window.scrollTo(0, 0); // Scroll to top on route change
+      window.scrollTo(0, 0);
     };
 
-    // Set initial route based on hash
     setRoute(window.location.hash);
 
     window.addEventListener('hashchange', handleHashChange);
@@ -36,8 +34,11 @@ const App: React.FC = () => {
     pageContent = <PrivacyPolicyPage />;
   } else if (route === '#/admin') {
     pageContent = <AdminDashboard />;
+  } else if (route.startsWith('#/admin/results')) {
+    pageContent = <AdminResults />;
+  } else if (route.startsWith('#/admin/winner')) {
+    pageContent = <AdminWinnerDetail />;
   } else {
-    // Default to main page if hash is empty, '#', or anything else
     showHero = true;
     pageContent = (
       <>
@@ -60,54 +61,12 @@ const App: React.FC = () => {
             </a>
           </div>
         </section>
-        <section id="faq" className="py-12 md:py-16 bg-transparent">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl font-luckiest text-custom-pink text-center mb-8">
-              Sipocalypse FAQ
-            </h2>
-            <div className="mx-auto max-w-3xl space-y-4 text-left">
-              <details className="rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                <summary className="cursor-pointer text-lg md:text-xl font-semibold text-white">
-                  What is Sipocalypse?
-                </summary>
-                <p className="mt-3 text-white/90">
-                  Sipocalypse is a drinking game rule and dare generator that creates playful, chaos-calibrated challenges for any activity.
-                </p>
-              </details>
-              <details className="rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                <summary className="cursor-pointer text-lg md:text-xl font-semibold text-white">
-                  How do the rules work?
-                </summary>
-                <p className="mt-3 text-white/90">
-                  Pick an activity and settings, then Sipocalypse generates rules and dares you can use immediately for your group.
-                </p>
-              </details>
-              <details className="rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                <summary className="cursor-pointer text-lg md:text-xl font-semibold text-white">
-                  Is Sipocalypse free to use?
-                </summary>
-                <p className="mt-3 text-white/90">
-                  Yes. Sipocalypse is free, with optional support if you want to buy the team a drink.
-                </p>
-              </details>
-              <details className="rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                <summary className="cursor-pointer text-lg md:text-xl font-semibold text-white">
-                  Is Sipocalypse for adults only?
-                </summary>
-                <p className="mt-3 text-white/90">
-                  Sipocalypse is intended for adults of legal drinking age. Please drink responsibly and follow local laws.
-                </p>
-              </details>
-            </div>
-          </div>
-        </section>
       </>
     );
   }
 
   return (
     <div className="bg-transparent text-gray-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
-      {/* Global Background Layer */}
       <div className="fixed inset-0 z-0">
         <img
           src="/background-1280.jpeg"
@@ -122,9 +81,9 @@ const App: React.FC = () => {
         <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      <Header /> {/* Header is sticky and has z-50 */}
-      {showHero && <Hero />} {/* Hero content will be on top of the global background */}
-      <main className="flex-grow relative z-10"> {/* Ensure main content is layered correctly above background */}
+      <Header />
+      {showHero && <Hero />}
+      <main className="flex-grow relative z-10">
         {pageContent}
       </main>
       <Footer />

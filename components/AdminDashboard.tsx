@@ -259,6 +259,12 @@ const AdminDashboard: React.FC = () => {
           >
             {isGeneratingImage ? 'Generating...' : 'Generate Winner Image'}
           </button>
+          <a
+            href="#/admin/results"
+            className="px-4 py-2 rounded-md bg-gray-700 text-white hover:bg-gray-600"
+          >
+            View Results
+          </a>
         </div>
         {jobStatus && <p className="text-sm text-green-300 mt-3">{jobStatus}</p>}
         {error && <p className="text-sm text-red-300 mt-3">{error}</p>}

@@ -6,6 +6,8 @@ import Hero from './components/Hero.js';
 import GameGenerator from './components/GameGenerator.js';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage.js';
 import AdminDashboard from './components/AdminDashboard.tsx';
+import AdminResults from './components/AdminResults.tsx';
+import AdminWinnerDetail from './components/AdminWinnerDetail.tsx';
 
 const App = () => {
   const [route, setRoute] = React.useState(() =>
@@ -36,6 +38,10 @@ const App = () => {
     pageContent = React.createElement(PrivacyPolicyPage, null);
   } else if (route === '#/admin') {
     pageContent = React.createElement(AdminDashboard, null);
+  } else if (route.startsWith('#/admin/results')) {
+    pageContent = React.createElement(AdminResults, null);
+  } else if (route.startsWith('#/admin/winner')) {
+    pageContent = React.createElement(AdminWinnerDetail, null);
   } else {
     // Default to main page if hash is empty, '#', or anything else
     showHero = true;
