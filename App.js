@@ -8,9 +8,13 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage.js';
 import AdminDashboard from './components/AdminDashboard.tsx';
 
 const App = () => {
-  const [route, setRoute] = React.useState(window.location.hash); // Changed to React.useState
+  const [route, setRoute] = React.useState(() =>
+    typeof window !== 'undefined' ? window.location.hash : ''
+  ); // Changed to React.useState
 
   React.useEffect(() => { // Changed to React.useEffect
+    if (typeof window === 'undefined') return;
+
     const handleHashChange = () => {
       setRoute(window.location.hash);
       window.scrollTo(0, 0); // Scroll to top on route change
@@ -52,6 +56,29 @@ const App = () => {
           },
           React.createElement("span", { role: "img", "aria-label": "Coffee cup", className: "mr-2 text-xl" }, "\u2615"),
           "Buy me a Drink"
+          )
+        )
+      ),
+      React.createElement("section", { id: "faq", className: "py-12 md:py-16 bg-transparent" },
+        React.createElement("div", { className: "container mx-auto px-4" },
+          React.createElement("h2", { className: "text-3xl md:text-4xl font-luckiest text-custom-pink text-center mb-8" }, "Sipocalypse FAQ"),
+          React.createElement("div", { className: "mx-auto max-w-3xl space-y-4 text-left" },
+            React.createElement("details", { className: "rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur" },
+              React.createElement("summary", { className: "cursor-pointer text-lg md:text-xl font-semibold text-white" }, "What is Sipocalypse?"),
+              React.createElement("p", { className: "mt-3 text-white/90" }, "Sipocalypse is a drinking game rule and dare generator that creates playful, chaos-calibrated challenges for any activity.")
+            ),
+            React.createElement("details", { className: "rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur" },
+              React.createElement("summary", { className: "cursor-pointer text-lg md:text-xl font-semibold text-white" }, "How do the rules work?"),
+              React.createElement("p", { className: "mt-3 text-white/90" }, "Pick an activity and settings, then Sipocalypse generates rules and dares you can use immediately for your group.")
+            ),
+            React.createElement("details", { className: "rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur" },
+              React.createElement("summary", { className: "cursor-pointer text-lg md:text-xl font-semibold text-white" }, "Is Sipocalypse free to use?"),
+              React.createElement("p", { className: "mt-3 text-white/90" }, "Yes. Sipocalypse is free, with optional support if you want to buy the team a drink.")
+            ),
+            React.createElement("details", { className: "rounded-xl border border-white/20 bg-white/10 p-5 backdrop-blur" },
+              React.createElement("summary", { className: "cursor-pointer text-lg md:text-xl font-semibold text-white" }, "Is Sipocalypse for adults only?"),
+              React.createElement("p", { className: "mt-3 text-white/90" }, "Sipocalypse is intended for adults of legal drinking age. Please drink responsibly and follow local laws.")
+            )
           )
         )
       )

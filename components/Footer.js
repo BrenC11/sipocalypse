@@ -23,6 +23,17 @@ const Footer = () => {
         React.createElement("p", { className: "text-sm opacity-90" },
           `© ${new Date().getFullYear()} ${APP_TITLE_PART1}${APP_TITLE_PART2}. All Rights Reserved.`
         ),
+        React.createElement("div", { className: "mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs" },
+          React.createElement("a", {
+            href: "#/privacy",
+            className: "text-custom-pink/90 hover:text-custom-lime transition-colors duration-300"
+          }, "Privacy Policy"),
+          React.createElement("span", { className: "text-white/30" }, "\u2022"),
+          React.createElement("a", {
+            href: "#/admin",
+            className: "text-custom-pink/90 hover:text-custom-lime transition-colors duration-300"
+          }, "Admin")
+        ),
         React.createElement("p", { className: "text-xs mt-2 opacity-70" },
           "Drink responsibly (or don't, it's the Sipocalypse)."
         )
