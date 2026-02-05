@@ -270,39 +270,16 @@ export default async function handler(req, res) {
       });
     }
 
-    const shouldUseDirectSheets = !googleSheetWebhookUrl && isGoogleSheetsConfigured() && Boolean(mailingListSheetId);
+    const shouldUseDirectSheets = isGoogleSheetsConfigured() && Boolean(mailingListSheetId);
     const sheetResult = {
       attempted: Boolean(googleSheetWebhookUrl || shouldUseDirectSheets),
       success: false,
       error: null,
-      mode: googleSheetWebhookUrl ? "webhook" : shouldUseDirectSheets ? "direct" : "disabled",
+      mode: shouldUseDirectSheets ? "direct" : googleSheetWebhookUrl ? "webhook" : "disabled",
     };
 
-    // Optional lead capture via existing webhook integration.
-    if (googleSheetWebhookUrl) {
-      try {
-        await appendLeadToGoogleSheet({
-          webhookUrl: googleSheetWebhookUrl,
-          secret: googleSheetWebhookSecret,
-          email,
-          activity,
-        });
-        sheetResult.success = true;
-      } catch (sheetError) {
-        sheetResult.error = sheetError instanceof Error ? sheetError.message : "Unknown sheet error";
-        console.error("Lead capture failed:", sheetResult.error);
-        if (strictSheetLogging) {
-          return res.status(502).json({
-            success: false,
-            error: "Email sent, but Google Sheet logging failed.",
-            sheet: sheetResult,
-          });
-        }
-      }
-    }
-
-    // Direct Google Sheets write (no webhook needed).
-    if (!googleSheetWebhookUrl && shouldUseDirectSheets) {
+    // Direct Google Sheets write (preferred).
+    if (shouldUseDirectSheets) {
       try {
         await appendCocktailLeadRecord({
           email,
@@ -313,7 +290,31 @@ export default async function handler(req, res) {
         sheetResult.success = true;
       } catch (sheetError) {
         sheetResult.error = sheetError instanceof Error ? sheetError.message : "Unknown sheet error";
-        console.error("Lead capture failed:", sheetResult.error);
+        console.error("Lead capture failed (direct):", sheetResult.error);
+        if (strictSheetLogging) {
+          return res.status(502).json({
+            success: false,
+            error: "Email sent, but Google Sheet logging failed.",
+            sheet: sheetResult,
+          });
+        }
+      }
+    }
+
+    // Webhook fallback if direct is not configured or failed.
+    if (!sheetResult.success && googleSheetWebhookUrl) {
+      sheetResult.mode = "webhook";
+      try {
+        await appendLeadToGoogleSheet({
+          webhookUrl: googleSheetWebhookUrl,
+          secret: googleSheetWebhookSecret,
+          email,
+          activity,
+        });
+        sheetResult.success = true;
+      } catch (sheetError) {
+        sheetResult.error = sheetError instanceof Error ? sheetError.message : "Unknown sheet error";
+        console.error("Lead capture failed (webhook):", sheetResult.error);
         if (strictSheetLogging) {
           return res.status(502).json({
             success: false,
