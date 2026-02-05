@@ -251,6 +251,17 @@ const appendValues = async (range, values, spreadsheetIdOverride = "") => {
 
 const normalizeHeader = (value) => String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 
+const indexToColumn = (index) => {
+  let result = "";
+  let n = index + 1;
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    result = String.fromCharCode(65 + rem) + result;
+    n = Math.floor((n - 1) / 26);
+  }
+  return result;
+};
+
 const getHeaderRow = async (sheetName, defaults, spreadsheetIdOverride = "") => {
   const current = await getValues(`${sheetName}!1:1`, spreadsheetIdOverride);
   if (current.length > 0 && current[0]?.length > 0) return current[0];
@@ -335,6 +346,18 @@ const appendRecord = async (sheetName, defaults, fields, dataByKey, spreadsheetI
   await appendValues(`${sheetName}!A:Z`, [row], spreadsheetIdOverride);
 };
 
+const updateRecordByIndex = async (sheetName, headers, rowIndex, fields, dataByKey, spreadsheetIdOverride = "") => {
+  const keyToHeader = getFieldMapFromHeaders(headers, fields);
+  const updatedRow = headers.map((header) => {
+    const field = fields.find((item) => keyToHeader[item.key] === header);
+    if (!field) return "";
+    return dataByKey[field.key] ?? "";
+  });
+  const lastColumn = indexToColumn(headers.length - 1);
+  const rowNumber = rowIndex + 2;
+  await updateValues(`${sheetName}!A${rowNumber}:${lastColumn}${rowNumber}`, [updatedRow], spreadsheetIdOverride);
+};
+
 export const appendGameRecord = async ({
   gameId,
   date,
@@ -386,6 +409,30 @@ export const fetchGamesByDate = async (date) => {
         status: row.status || "generated",
       };
     });
+};
+
+export const fetchGameById = async (gameId) => {
+  const { headers, rows } = await getSheetRows("games");
+  const mapped = rows.map((row) => toRecordByFields(row, headers, GAMES_FIELDS));
+  const matchIndex = mapped.findIndex((row) => String(row.gameId || "").trim() === String(gameId).trim());
+  if (matchIndex < 0) return null;
+  const row = mapped[matchIndex];
+  const rules = parseJsonArray(row.rulesJson);
+  const dares = parseJsonArray(row.daresJson);
+  return {
+    gameId: row.gameId,
+    date: row.date,
+    createdAt: row.createdAt || "",
+    activity: row.activity || "",
+    gameName: row.gameName || row.activity || "",
+    chaosLevel: toNumberOr(row.chaosLevel, 1),
+    ruleCount: toNumberOr(row.ruleCount, Array.isArray(rules) ? rules.length : 0),
+    dareCount: toNumberOr(row.dareCount, Array.isArray(dares) ? dares.length : 0),
+    rules: Array.isArray(rules) ? rules : [],
+    dares: Array.isArray(dares) ? dares : [],
+    chaosScore: toNumberOr(row.chaosScore, 0),
+    status: row.status || "generated",
+  };
 };
 
 export const appendDailyScores = async (scores) => {
@@ -450,6 +497,23 @@ export const appendWinner = async ({
     postedAt,
     createdAt,
   });
+};
+
+export const updateWinnerByDate = async ({ date, updates }) => {
+  const { headers, rows } = await getSheetRows("winners");
+  if (!headers.length || !rows.length) return { ok: false, error: "No winner rows found." };
+
+  const mapped = rows.map((row) => toRecordByFields(row, headers, WINNERS_FIELDS));
+  const matchIndex = mapped.findIndex((row) => String(row.date || "").trim() === String(date).trim());
+  if (matchIndex < 0) return { ok: false, error: "Winner not found for date." };
+
+  const merged = {
+    ...mapped[matchIndex],
+    ...updates,
+  };
+
+  await updateRecordByIndex("winners", headers, matchIndex, WINNERS_FIELDS, merged);
+  return { ok: true, winner: merged };
 };
 
 export const verifyGoogleSheetsAccess = async () => {

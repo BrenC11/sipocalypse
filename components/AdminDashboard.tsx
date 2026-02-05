@@ -16,6 +16,7 @@ type Winner = {
   score: number;
   status?: string;
   imagePrompt?: string;
+  imageUrl?: string;
   socialCaption?: string;
 };
 
@@ -37,6 +38,9 @@ const AdminDashboard: React.FC = () => {
   const [winner, setWinner] = useState<Winner | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [jobStatus, setJobStatus] = useState<string | null>(null);
+  const [imageStatus, setImageStatus] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const totalGames = useMemo(() => games.length, [games]);
 
@@ -148,6 +152,30 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const generateWinnerImage = async () => {
+    setImageStatus('Generating image...');
+    setImageError(null);
+    setIsGeneratingImage(true);
+    try {
+      const resp = await fetch('/api/admin/generate-winner-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date }),
+      });
+      const payload = await resp.json();
+      if (!resp.ok) {
+        throw new Error(payload?.error || 'Image generation failed.');
+      }
+      setWinner(payload?.winner || null);
+      setImageStatus('Image generated.');
+    } catch (err: any) {
+      setImageError(err?.message || 'Image generation failed.');
+      setImageStatus(null);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   if (loading) {
     return <div className="max-w-4xl mx-auto px-4 py-12">Loading admin dashboard...</div>;
   }
@@ -223,9 +251,18 @@ const AdminDashboard: React.FC = () => {
           >
             Run Daily Scoring
           </button>
+          <button
+            onClick={generateWinnerImage}
+            className="px-4 py-2 rounded-md bg-purple-500 text-white font-semibold hover:bg-purple-400"
+            disabled={isGeneratingImage}
+          >
+            {isGeneratingImage ? 'Generating...' : 'Generate Winner Image'}
+          </button>
         </div>
         {jobStatus && <p className="text-sm text-green-300 mt-3">{jobStatus}</p>}
         {error && <p className="text-sm text-red-300 mt-3">{error}</p>}
+        {imageStatus && <p className="text-sm text-green-300 mt-3">{imageStatus}</p>}
+        {imageError && <p className="text-sm text-red-300 mt-3">{imageError}</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -238,6 +275,16 @@ const AdminDashboard: React.FC = () => {
               <p><span className="text-gray-400">Activity:</span> {winner.activity}</p>
               <p><span className="text-gray-400">Score:</span> {winner.score}/100</p>
               {winner.status && <p><span className="text-gray-400">Status:</span> {winner.status}</p>}
+              {winner.imageUrl && (
+                <div className="pt-3">
+                  <img
+                    src={winner.imageUrl}
+                    alt="Winner card"
+                    className="w-full rounded-lg border border-gray-700"
+                  />
+                  <p className="text-xs text-gray-400 mt-2">Image link expires after about 60 minutes unless stored.</p>
+                </div>
+              )}
             </div>
           )}
         </div>
